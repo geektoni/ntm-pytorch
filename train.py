@@ -20,7 +20,7 @@ configure("runs/")
 # -- initialize datasets, model, criterion and optimizer
 # ----------------------------------------------------------------------------
 
-args.task_json = 'ntm/tasks/copy.json'
+#args.task_json = 'ntm/tasks/copy.json'
 '''
 args.task_json = 'ntm/tasks/repeatcopy.json'
 args.task_json = 'ntm/tasks/associative.json'
@@ -30,7 +30,8 @@ args.task_json = 'ntm/tasks/prioritysort.json'
 
 task_params = json.load(open(args.task_json))
 
-dataset = CopyDataset(task_params)
+#dataset = CopyDataset(task_params)
+dataset = PrioritySort(task_params)
 '''
 dataset = RepeatCopyDataset(task_params)
 dataset = AssociativeDataset(task_params)
@@ -45,7 +46,7 @@ For the Associative task, input_size: seq_width + 2, output_size: seq_width
 For the NGram task, input_size: 1, output_size: 1
 For the Priority Sort task, input_size: seq_width + 1, output_size: seq_width
 """
-ntm = NTM(input_size=task_params['seq_width'] + 2,
+ntm = NTM(input_size=task_params['seq_width'] + 1,
           output_size=task_params['seq_width'],
           controller_size=task_params['controller_size'],
           memory_units=task_params['memory_units'],
