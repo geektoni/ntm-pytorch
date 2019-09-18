@@ -8,5 +8,5 @@
 	"input_seq_len": 20,
 	"target_seq_len": 16,
   "uniform": false,
-  "random_distr": false
+  "random_distr": true
 }

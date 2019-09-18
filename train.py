@@ -13,7 +13,6 @@ from ntm.args import get_parser
 
 torch.set_num_threads(2)
 
-
 args = get_parser().parse_args()
 
 print(args)
