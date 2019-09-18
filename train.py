@@ -14,6 +14,8 @@ from ntm.args import get_parser
 
 args = get_parser().parse_args()
 
+print(args)
+
 configure("runs/")
 
 # ----------------------------------------------------------------------------
