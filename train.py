@@ -11,12 +11,14 @@ from ntm import NTM
 from ntm.datasets import CopyDataset, RepeatCopyDataset, AssociativeDataset, NGram, PrioritySort
 from ntm.args import get_parser
 
+torch.set_num_threads(2)
+
 
 args = get_parser().parse_args()
 
 print(args)
 
-configure("runs/")
+configure("runs/{}".format(args.saved_model))
 
 # ----------------------------------------------------------------------------
 # -- initialize datasets, model, criterion and optimizer
@@ -31,6 +33,7 @@ args.task_json = 'ntm/tasks/prioritysort.json'
 '''
 
 task_params = json.load(open(args.task_json))
+print(task_params)
 
 #dataset = CopyDataset(task_params)
 dataset = PrioritySort(task_params)
@@ -66,8 +69,8 @@ optimizer = optim.Adam(ntm.parameters(), lr=args.lr,
                        betas=(args.beta1, args.beta2))
 '''
 
-args.saved_model = 'saved_model_copy.pt'
 '''
+args.saved_model = 'saved_model_copy.pt'
 args.saved_model = 'saved_model_repeatcopy.pt'
 args.saved_model = 'saved_model_associative.pt'
 args.saved_model = 'saved_model_ngram.pt'
@@ -131,7 +134,7 @@ for iter in tqdm(range(args.num_iters)):
     errors.append(error.item())
 
     # ---logging---
-    if iter % 200 == 0:
+    if iter % 100 == 0:
         print('Iteration: %d\tLoss: %.2f\tError in bits per sequence: %.2f' %
               (iter, np.mean(losses), np.mean(errors)))
         log_value('train_loss', np.mean(losses), iter)
