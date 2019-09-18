@@ -48,12 +48,13 @@ class PrioritySort(Dataset):
         # This minor difference is being ignored here as supposedly it doesn't
         # affects the task.
         if not self.uniform:
-            alpha = 2.0
-            beta = 5.0
+            alpha = torch.tensor([2.0])
+            beta = torch.tensor([5.0])
             if self.random_distr:
-                alpha = Uniform(torch.tensor([0]), torch.tensor([100.0]))
-                beta =  Uniform(torch.tensor([0]), torch.tensor([100.0]))
-            priority = Beta(torch.tensor([alpha]), torch.tensor([beta]))
+                alpha_beta_gen = Uniform(torch.tensor([0]), torch.tensor([100.0])).sample()
+                alpha = alpha_beta_gen.sample()
+                beta = alpha_beta_gen.sample()
+            priority = Beta(alpha, beta)
         else:
             priority = Uniform(torch.tensor([-1.0]), torch.tensor([1.0]))
 
