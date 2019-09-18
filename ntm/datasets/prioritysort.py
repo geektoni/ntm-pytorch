@@ -51,7 +51,7 @@ class PrioritySort(Dataset):
             alpha = torch.tensor([2.0])
             beta = torch.tensor([5.0])
             if self.random_distr:
-                alpha_beta_gen = Uniform(torch.tensor([0]), torch.tensor([100.0]))
+                alpha_beta_gen = Uniform(torch.tensor([0.0]), torch.tensor([100.0]))
                 alpha = alpha_beta_gen.sample()
                 beta = alpha_beta_gen.sample()
             priority = Beta(alpha, beta)
