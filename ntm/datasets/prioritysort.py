@@ -27,6 +27,7 @@ class PrioritySort(Dataset):
         self.input_seq_len = task_params["input_seq_len"]
         self.target_seq_len = task_params["target_seq_len"]
         self.uniform = task_params["uniform"]
+        self.random_distr = task_params["random_distr"]
 
     def __len__(self):
         # sequences are generated randomly so this does not matter
