@@ -23,4 +23,6 @@ def get_parser():
                         help='beta1 constant for adam optimizer')
     parser.add_argument('-beta2', type=float, default=0.999,
                         help='beta2 constant for adam optimizer')
+    parser.add_argument('-non-uniform', type=bool, default=False,
+                        help='use non-uniform distribution to sample priorities')
     return parser
