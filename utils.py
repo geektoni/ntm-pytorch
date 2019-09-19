@@ -81,12 +81,8 @@ def generate_target_original_plots(iteration, task_params, model_path, image_out
     ax1_2.set_title("Read Weigths")
     ax2_2.set_title("Write Weights")
 
-    print(len(ntm.all_write_w))
-
     sns.heatmap(ntm.all_read_w, ax=ax1_2, linewidths=.01, square=True)
     sns.heatmap(ntm.all_write_w, ax=ax2_2, linewidths=.01, square=True)
-
-
 
     plt.tight_layout()
     plt.savefig(image_output+"/priority_sort_{}_{}_{}_{}_{}_{}_weigths_{}.png".format(
