@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import json
 from tqdm import tqdm
 import numpy as np
@@ -11,37 +14,53 @@ from ntm import NTM
 from ntm.datasets import CopyDataset, RepeatCopyDataset, AssociativeDataset, NGram, PrioritySort
 from ntm.args import get_parser
 
+from utils import *
+
 torch.set_num_threads(2)
 
 args = get_parser().parse_args()
 
 print(args)
 
-configure("runs/{}".format(args.saved_model))
-
 # ----------------------------------------------------------------------------
 # -- initialize datasets, model, criterion and optimizer
 # ----------------------------------------------------------------------------
-
+#
 #args.task_json = 'ntm/tasks/copy.json'
-'''
-args.task_json = 'ntm/tasks/repeatcopy.json'
-args.task_json = 'ntm/tasks/associative.json'
-args.task_json = 'ntm/tasks/ngram.json'
-args.task_json = 'ntm/tasks/prioritysort.json'
-'''
+#args.task_json = 'ntm/tasks/repeatcopy.json'
+#args.task_json = 'ntm/tasks/associative.json'
+#args.task_json = 'ntm/tasks/ngram.json'
+#args.task_json = 'ntm/tasks/prioritysort.json'
 
 task_params = json.load(open(args.task_json))
 print(task_params)
 
+dataset = PrioritySort(task_params)
 #dataset = CopyDataset(task_params)
-dataset = PrioritySort(task_params)
-'''
-dataset = RepeatCopyDataset(task_params)
-dataset = AssociativeDataset(task_params)
-dataset = NGram(task_params)
-dataset = PrioritySort(task_params)
-'''
+#dataset = RepeatCopyDataset(task_params)
+#dataset = AssociativeDataset(task_params)
+#dataset = NGram(task_params)
+#dataset = PrioritySort(task_params)
+
+saved_model_name = "priority_sort_{}_{}_{}_{}_{}_{}.pt".format(
+    task_params['seq_width'] + 1,
+    task_params['seq_width'],
+    task_params['controller_size'],
+    task_params['memory_units'],
+    task_params['memory_unit_size'],
+    task_params['num_heads']
+)
+
+# Output directory for tensorboard
+configure(args.tb_dir+"/priority_sort_{}_{}_{}_{}_{}_{}".format(
+    task_params['seq_width'] + 1,
+    task_params['seq_width'],
+    task_params['controller_size'],
+    task_params['memory_units'],
+    task_params['memory_unit_size'],
+    task_params['num_heads']
+))
+
 
 """
 For the Copy task, input_size: seq_width + 2, output_size: seq_width
@@ -76,8 +95,22 @@ args.saved_model = 'saved_model_ngram.pt'
 args.saved_model = 'saved_model_prioritysort.pt'
 '''
 
-cur_dir = os.getcwd()
-PATH = os.path.join(cur_dir, args.saved_model)
+# Path for the model
+PATH = args.output_dir+"/priority_sort_{}_{}_{}_{}_{}_{}/".format(
+    task_params['seq_width'] + 1,
+    task_params['seq_width'],
+    task_params['controller_size'],
+    task_params['memory_units'],
+    task_params['memory_unit_size'],
+    task_params['num_heads']
+)
+# Check if the directory exists. Create it otherwise
+if not os.path.isdir(PATH):
+    os.makedirs(PATH)
+    os.makedirs(PATH+"/images")
+
+bare_path = PATH
+PATH = PATH+saved_model_name
 
 # ----------------------------------------------------------------------------
 # -- basic training loop
@@ -134,13 +167,20 @@ for iter in tqdm(range(args.num_iters)):
 
     # ---logging---
     if iter % 100 == 0:
-        print('Iteration: %d\tLoss: %.2f\tError in bits per sequence: %.2f' %
+        print('[*] Iteration: %d\tLoss: %.2f\tError in bits per sequence: %.2f' %
               (iter, np.mean(losses), np.mean(errors)))
         log_value('train_loss', np.mean(losses), iter)
         log_value('bit_error_per_sequence', np.mean(errors), iter)
         losses = []
         errors = []
 
+    # ---checkpoint---
+    if iter % args.checkpoint == 0:
+        print ('[*] Creating a checkpoint:')
+        torch.save(ntm.state_dict(), PATH+".checkpoint_{}".format(iter))
+
+        # Save an image with
+        generate_target_original_plots(iter, task_params, PATH+".checkpoint_{}".format(iter), bare_path+"/images")
+
 # ---saving the model---
 torch.save(ntm.state_dict(), PATH)
-# torch.save(ntm, PATH)
