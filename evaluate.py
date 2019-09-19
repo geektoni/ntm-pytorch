@@ -1,6 +1,8 @@
 import json
 import os
 import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set()
 
 import torch
 from torch import nn
@@ -11,8 +13,11 @@ from ntm.args import get_parser
 
 args = get_parser().parse_args()
 
-args.task_json = 'ntm/tasks/copy.json'
+print(args)
+print()
+
 '''
+args.task_json = 'ntm/tasks/copy.json'
 args.task_json = 'ntm/tasks/repeatcopy.json'
 args.task_json = 'ntm/tasks/associative.json'
 args.task_json = 'ntm/tasks/ngram.json'
@@ -20,13 +25,13 @@ args.task_json = 'ntm/tasks/prioritysort.json'
 '''
 
 task_params = json.load(open(args.task_json))
+print(task_params)
 criterion = nn.BCELoss()
 
+'''
 # ---Evaluation parameters for Copy task---
 task_params['min_seq_len'] = 20
 task_params['max_seq_len'] = 120
-
-'''
 # ---Evaluation parameters for RepeatCopy task---
 # (Sequence length generalisation)
 task_params['min_seq_len'] = 10
@@ -34,7 +39,6 @@ task_params['max_seq_len'] = 20
 # (Number of repetition generalisation)
 task_params['min_repeat'] = 10
 task_params['max_repeat'] = 20
-
 # ---Evaluation parameters for AssociativeRecall task---
 task_params['min_item'] = 6
 task_params['max_item'] = 20
@@ -42,16 +46,17 @@ task_params['max_item'] = 20
 # For NGram and Priority sort task parameters need not be changed.
 '''
 
-dataset = CopyDataset(task_params)
 '''
+dataset = CopyDataset(task_params)
 dataset = RepeatCopyDataset(task_params)
 dataset = AssociativeDataset(task_params)
 dataset = NGram(task_params)
 dataset = PrioritySort(task_params)
 '''
+dataset = PrioritySort(task_params)
 
-args.saved_model = 'saved_model_copy.pt'
 '''
+args.saved_model = 'saved_model_copy.pt'
 args.saved_model = 'saved_model_repeatcopy.pt'
 args.saved_model = 'saved_model_associative.pt'
 args.saved_model = 'saved_model_ngram.pt'
@@ -71,7 +76,7 @@ For the NGram task, input_size: 1, output_size: 1
 For the Priority Sort task, input_size: seq_width + 1, output_size: seq_width
 """
 
-ntm = NTM(input_size=task_params['seq_width'] + 2,
+ntm = NTM(input_size=task_params['seq_width'] + 1,
           output_size=task_params['seq_width'],
           controller_size=task_params['controller_size'],
           memory_units=task_params['memory_units'],
@@ -120,6 +125,19 @@ binary_output = binary_output.detach().apply_(lambda x: 0 if x < 0.5 else 1)
 
 # sequence prediction error is calculted in bits per sequence
 error = torch.sum(torch.abs(binary_output - target))
+
+
+fig = plt.figure()
+ax1 = fig.add_subplot(211)
+ax2 = fig.add_subplot(221)
+
+ax1.set_title("Result")
+ax2.set_title("Target")
+
+sns.heatmap(binary_output, ax=ax1, vmin=0, vmax=1, linewidths=.5, cbar=False, square=True )
+sns.heatmap(target, ax=ax2, vmin=0, vmax=1, linewidths=.5, cbar=False, square=True)
+
+plt.show()
 
 # ---logging---
 print('Loss: %.2f\tError in bits per sequence: %.2f' % (loss, error))
