@@ -68,7 +68,7 @@ class NTMHead(nn.Module):
         key = self.key_fc(controller_state)
         b = F.softplus(self.key_strength_fc(controller_state))
         g = torch.sigmoid(self.interpolation_gate_fc(controller_state))
-        s = F.softmax(self.shift_weighting_fc(controller_state))
+        s = F.softmax(self.shift_weighting_fc(controller_state), dim=1)
         # here the sharpening factor is less than 1 whereas as required in the
         # paper it should be greater than 1. hence adding 1.
         y = 1 + F.softplus(self.sharpen_factor_fc(controller_state))
