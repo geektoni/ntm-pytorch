@@ -114,5 +114,5 @@ class NTMMemory(nn.Module):
         # self.memory = torch.zeros([batch_size, self.n, self.m])
         # nn.init.kaiming_uniform_(self.memory)
         in_data = torch.tensor([[0.]])  # dummy input
-        memory_bias = F.sigmoid(self.memory_bias_fc(in_data))
+        memory_bias = torch.sigmoid(self.memory_bias_fc(in_data))
         self.memory = memory_bias.view(self.n, self.m).repeat(batch_size, 1, 1)

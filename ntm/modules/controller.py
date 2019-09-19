@@ -33,7 +33,7 @@ class NTMController(nn.Module):
 
     def output(self, read_data):
         complete_state = torch.cat([self.h_state] + read_data, dim=-1)
-        output = F.sigmoid(self.out_net(complete_state))
+        output = torch.sigmoid(self.out_net(complete_state))
         return output
 
     def reset(self, batch_size=1):
