@@ -61,7 +61,7 @@ class PrioritySort(Dataset):
         for i in range(self.input_seq_len):
             input_seq[i, self.seq_width] = priority.sample()
 
-        sorted, _ = torch.sort(input_seq, 0, descending=True)
-        target_seq = sorted[:self.target_seq_len, :self.seq_width]
+        sorted_index = torch.sort(input_seq[:, -1], descending=True)[1]
+        target_seq = input_seq[sorted_index][:self.target_seq_len, :self.seq_width]
 
         return {'input': input_seq, 'target': target_seq}
