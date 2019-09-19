@@ -21,7 +21,8 @@ def generate_target_original_plots(iteration, task_params, model_path, image_out
               controller_size=task_params['controller_size'],
               memory_units=task_params['memory_units'],
               memory_unit_size=task_params['memory_unit_size'],
-              num_heads=task_params['num_heads'])
+              num_heads=task_params['num_heads'],
+              save_weigths=True)
 
     ntm.load_state_dict(torch.load(model_path))
 
@@ -73,6 +74,30 @@ def generate_target_original_plots(iteration, task_params, model_path, image_out
         task_params['num_heads'],
         iteration
     ))
+
+    fig = plt.figure(figsize=(15,6))
+    ax1_2 = fig.add_subplot(211)
+    ax2_2 = fig.add_subplot(212)
+    ax1_2.set_title("Read Weigths")
+    ax2_2.set_title("Write Weights")
+
+    print(len(ntm.all_write_w))
+
+    sns.heatmap(ntm.all_read_w, ax=ax1_2, linewidths=.01, square=True)
+    sns.heatmap(ntm.all_write_w, ax=ax2_2, linewidths=.01, square=True)
+
+
+
+    plt.tight_layout()
+    plt.savefig(image_output+"/priority_sort_{}_{}_{}_{}_{}_{}_weigths_{}.png".format(
+        task_params['seq_width'] + 1,
+        task_params['seq_width'],
+        task_params['controller_size'],
+        task_params['memory_units'],
+        task_params['memory_unit_size'],
+        task_params['num_heads'],
+        iteration
+    ), dpi=250)
 
     # ---logging---
     print('[*] Checkpoint Loss: %.2f\tError in bits per sequence: %.2f' % (loss, error))

@@ -13,7 +13,8 @@ class NTM(nn.Module):
                  controller_size,
                  memory_units,
                  memory_unit_size,
-                 num_heads):
+                 num_heads,
+                 save_weigths=False):
         super().__init__()
         self.controller_size = controller_size
         self.controller = NTMController(
@@ -33,6 +34,12 @@ class NTM(nn.Module):
 
         self.prev_head_weights = []
         self.prev_reads = []
+
+        self.save_weigths = save_weigths
+        if self.save_weigths:
+            self.all_read_w = []
+            self.all_write_w = []
+
         self.reset()
 
     def reset(self, batch_size=1):
@@ -54,15 +61,29 @@ class NTM(nn.Module):
             in_data, self.prev_reads)
         read_data = []
         head_weights = []
+
+        temporary_read_w = []
+        temporary_write_w = []
+
         for head, prev_head_weight in zip(self.heads, self.prev_head_weights):
             if head.mode == 'r':
                 head_weight, r = head(
                     controller_c_state, prev_head_weight, self.memory)
                 read_data.append(r)
+                if self.save_weigths:
+                    temporary_read_w.append(head_weight[0])
             else:
                 head_weight, _ = head(
                     controller_c_state, prev_head_weight, self.memory)
+                if self.save_weigths:
+                    temporary_write_w.append(head_weight[0])
             head_weights.append(head_weight)
+
+        if self.save_weigths:
+            mean_w = torch.mean(torch.stack(temporary_read_w), dim=0)
+            mean_r = torch.mean(torch.stack(temporary_write_w), dim=0)
+            self.all_write_w.append(mean_w.tolist())
+            self.all_read_w.append(mean_r.tolist())
 
         output = self.controller.output(read_data)
 
