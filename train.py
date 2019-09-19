@@ -42,23 +42,27 @@ dataset = PrioritySort(task_params)
 #dataset = NGram(task_params)
 #dataset = PrioritySort(task_params)
 
-saved_model_name = "priority_sort_{}_{}_{}_{}_{}_{}.pt".format(
+saved_model_name = "priority_sort_{}_{}_{}_{}_{}_{}_{}_{}.pt".format(
     task_params['seq_width'] + 1,
     task_params['seq_width'],
     task_params['controller_size'],
     task_params['memory_units'],
     task_params['memory_unit_size'],
-    task_params['num_heads']
+    task_params['num_heads'],
+    task_params['uniform'],
+    task_params['random_distr']
 )
 
 # Output directory for tensorboard
-configure(args.tb_dir+"/priority_sort_{}_{}_{}_{}_{}_{}".format(
+configure(args.tb_dir+"/priority_sort_{}_{}_{}_{}_{}_{}_{}_{}".format(
     task_params['seq_width'] + 1,
     task_params['seq_width'],
     task_params['controller_size'],
     task_params['memory_units'],
     task_params['memory_unit_size'],
-    task_params['num_heads']
+    task_params['num_heads'],
+    task_params['uniform'],
+    task_params['random_distr']
 ))
 
 
@@ -96,13 +100,15 @@ args.saved_model = 'saved_model_prioritysort.pt'
 '''
 
 # Path for the model
-PATH = args.output_dir+"/priority_sort_{}_{}_{}_{}_{}_{}/".format(
+PATH = args.output_dir+"/priority_sort_{}_{}_{}_{}_{}_{}_{}_{}/".format(
     task_params['seq_width'] + 1,
     task_params['seq_width'],
     task_params['controller_size'],
     task_params['memory_units'],
     task_params['memory_unit_size'],
-    task_params['num_heads']
+    task_params['num_heads'],
+    task_params['uniform'],
+    task_params['random_distr']
 )
 # Check if the directory exists. Create it otherwise
 if not os.path.isdir(PATH):
@@ -166,7 +172,7 @@ for iter in tqdm(range(args.num_iters)):
     errors.append(error.item())
 
     # ---logging---
-    if iter % 100 == 0:
+    if iter % 100 == 0 and iter != 0:
         print('[*] Iteration: %d\tLoss: %.2f\tError in bits per sequence: %.2f' %
               (iter, np.mean(losses), np.mean(errors)))
         log_value('train_loss', np.mean(losses), iter)
@@ -175,7 +181,7 @@ for iter in tqdm(range(args.num_iters)):
         errors = []
 
     # ---checkpoint---
-    if iter % args.checkpoint == 0:
+    if iter % args.checkpoint == 0 and iter != 0:
         print ('[*] Creating a checkpoint:')
         torch.save(ntm.state_dict(), PATH+".checkpoint_{}".format(iter))
 
