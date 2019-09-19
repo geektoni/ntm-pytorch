@@ -15,7 +15,7 @@ def get_parser():
                         help='number of iterations for training')
     parser.add_argument('-checkpoint', type=int, default=1000,
                         help='Every x iteration, do a snapshot of the model and produce some images.')
-    parser.add_argument('-multi_layer_controller', type=bool, default=False
+    parser.add_argument('-multi_layer_controller', type=bool, default=False,
                         help='Use a controller with two LSTM.')
 
     # todo: only rmsprop optimizer supported yet, support adam too

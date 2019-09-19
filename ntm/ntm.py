@@ -14,7 +14,7 @@ class NTM(nn.Module):
                  memory_units,
                  memory_unit_size,
                  num_heads,
-                 save_weigths=False
+                 save_weigths=False,
                  multi_layer_controller=False):
         super().__init__()
         self.controller_size = controller_size

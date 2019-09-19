@@ -33,6 +33,7 @@ print(args)
 #args.task_json = 'ntm/tasks/prioritysort.json'
 
 task_params = json.load(open(args.task_json))
+task_params['multi_layer_controller'] = args.multi_layer_controller
 print(task_params)
 
 dataset = PrioritySort(task_params)
