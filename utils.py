@@ -22,7 +22,8 @@ def generate_target_original_plots(iteration, task_params, model_path, image_out
               memory_units=task_params['memory_units'],
               memory_unit_size=task_params['memory_unit_size'],
               num_heads=task_params['num_heads'],
-              save_weigths=True)
+              save_weigths=True,
+              multi_layer_controller=task_params['multi_layer_controller'])
 
     ntm.load_state_dict(torch.load(model_path))
 
@@ -65,7 +66,7 @@ def generate_target_original_plots(iteration, task_params, model_path, image_out
     sns.heatmap(binary_output, ax=ax1, vmin=0, vmax=1, linewidths=.5, cbar=False, square=True )
     sns.heatmap(target, ax=ax2, vmin=0, vmax=1, linewidths=.5, cbar=False, square=True)
 
-    plt.savefig(image_output+"/priority_sort_{}_{}_{}_{}_{}_{}_{}_{}_image_{}.png".format(
+    plt.savefig(image_output+"/priority_sort_{}_{}_{}_{}_{}_{}_{}_{}_{}_image_{}.png".format(
         task_params['seq_width'] + 1,
         task_params['seq_width'],
         task_params['controller_size'],
@@ -74,6 +75,7 @@ def generate_target_original_plots(iteration, task_params, model_path, image_out
         task_params['num_heads'],
         task_params['uniform'],
         task_params['random_distr'],
+        task_params['multi_layer_controller'],
         iteration
     ))
 
@@ -87,7 +89,7 @@ def generate_target_original_plots(iteration, task_params, model_path, image_out
     sns.heatmap(ntm.all_write_w, ax=ax2_2, linewidths=.01, square=True)
 
     plt.tight_layout()
-    plt.savefig(image_output+"/priority_sort_{}_{}_{}_{}_{}_{}_{}_{}_weigths_{}.png".format(
+    plt.savefig(image_output+"/priority_sort_{}_{}_{}_{}_{}_{}_{}_{}_{}_weigths_{}.png".format(
         task_params['seq_width'] + 1,
         task_params['seq_width'],
         task_params['controller_size'],
@@ -96,6 +98,7 @@ def generate_target_original_plots(iteration, task_params, model_path, image_out
         task_params['num_heads'],
         task_params['uniform'],
         task_params['random_distr'],
+        task_params['multi_layer_controller'],
         iteration
     ), dpi=250)
 

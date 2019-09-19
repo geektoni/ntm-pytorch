@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 
-from .modules.controller import NTMController
+from .modules.controller import NTMController, NTMControllerTwoLSTM
 from .modules.head import NTMHead
 from .modules.memory import NTMMemory
 
@@ -14,12 +14,18 @@ class NTM(nn.Module):
                  memory_units,
                  memory_unit_size,
                  num_heads,
-                 save_weigths=False):
+                 save_weigths=False
+                 multi_layer_controller=False):
         super().__init__()
         self.controller_size = controller_size
-        self.controller = NTMController(
-            input_size + num_heads * memory_unit_size, controller_size, output_size,
-            read_data_size=controller_size + num_heads * memory_unit_size)
+        if not multi_layer_controller:
+            self.controller = NTMController(
+                input_size + num_heads * memory_unit_size, controller_size, output_size,
+                read_data_size=controller_size + num_heads * memory_unit_size)
+        else:
+            self.controller = NTMControllerTwoLSTM(
+                input_size + num_heads * memory_unit_size, controller_size, output_size,
+                read_data_size=controller_size + num_heads * memory_unit_size)
 
         self.memory = NTMMemory(memory_units, memory_unit_size)
         self.memory_unit_size = memory_unit_size
