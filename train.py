@@ -17,6 +17,8 @@ from ntm.args import get_parser
 from utils import *
 
 torch.set_num_threads(2)
+np.random.seed(42)
+torch.manual_seed(42)
 
 args = get_parser().parse_args()
 
@@ -83,6 +85,9 @@ ntm = NTM(input_size=task_params['seq_width'] + 1,
           memory_unit_size=task_params['memory_unit_size'],
           num_heads=task_params['num_heads'],
           multi_layer_controller=task_params['multi_layer_controller'])
+
+if args.load_model != "":
+    ntm.load_state_dict(torch.load(args.load_model))
 
 criterion = nn.BCELoss()
 # As the learning rate is task specific, the argument can be moved to json file

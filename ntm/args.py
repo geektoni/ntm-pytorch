@@ -3,9 +3,9 @@ import argparse
 
 def get_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-task_json', type=str, default='ntm/tasks/copy.json',
+    parser.add_argument('-task_json', type=str, default='ntm/tasks/prioritysort.json',
                         help='path to json file with task specific parameters')
-    parser.add_argument('-output_dir', default='./models',
+    parser.add_argument('-output_dir', default='./checkpoints',
                         help='path to directory were to save the models')
     parser.add_argument('-tb_dir', default='./tensorboard',
                         help='path to directory where to save tensorboard output')
@@ -31,4 +31,5 @@ def get_parser():
                         help='beta2 constant for adam optimizer')
     parser.add_argument('-non-uniform', type=bool, default=False,
                         help='use non-uniform distribution to sample priorities')
+    parser.add_argument('-load_model', type=str, default="", help="Start training using this model.")
     return parser
