@@ -1,12 +1,12 @@
 {
 	"task": "prioritysort",
-	"controller_size": 100,
-	"memory_units": 128,
+	"controller_size": 200,
+	"memory_units": 64,
 	"memory_unit_size": 20,
 	"num_heads": 1,
 	"seq_width": 8,
-	"input_seq_len": 20,
-	"target_seq_len": 16,
+	"input_seq_len": 8,
+	"target_seq_len": 8,
   "uniform": true,
   "random_distr": false
 }
