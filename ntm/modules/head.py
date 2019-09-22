@@ -81,7 +81,9 @@ class NTMHead(nn.Module):
         shifted_weights = self._circular_conv1d(interpolated_weights, s)
         # the softmax introduces the exp of the argument which isn't there in
         # the paper. there it's just a simple normalization of the arguments.
-        current_weights = shifted_weights ** y
+
+        # added 1e-16 assuming that the shifted_weights dtype is at least float32
+        current_weights = (shifted_weights + 1e-16) ** y
         # current_weights = F.softmax(shifted_weights ** y)
         current_weights = torch.div(current_weights, torch.sum(
             current_weights, dim=1).view(-1, 1) + 1e-16)
