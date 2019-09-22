@@ -45,9 +45,10 @@ dataset = PrioritySort(task_params)
 #dataset = NGram(task_params)
 #dataset = PrioritySort(task_params)
 
-saved_model_name = "priority_sort_{}_{}_{}_{}_{}_{}_{}_{}_{}.pt".format(
-    task_params['seq_width'] + 1,
+saved_model_name = "priority_sort_{}_{}_{}_{}_{}_{}_{}_{}_{}_{}".format(
     task_params['seq_width'],
+    task_params['input_seq_len'],
+    task_params['target_seq_len'],
     task_params['controller_size'],
     task_params['memory_units'],
     task_params['memory_unit_size'],
@@ -58,17 +59,7 @@ saved_model_name = "priority_sort_{}_{}_{}_{}_{}_{}_{}_{}_{}.pt".format(
 )
 
 # Output directory for tensorboard
-configure(args.tb_dir+"/priority_sort_{}_{}_{}_{}_{}_{}_{}_{}_{}".format(
-    task_params['seq_width'] + 1,
-    task_params['seq_width'],
-    task_params['controller_size'],
-    task_params['memory_units'],
-    task_params['memory_unit_size'],
-    task_params['num_heads'],
-    task_params['uniform'],
-    task_params['random_distr'],
-    task_params['multi_layer_controller']
-))
+configure(args.tb_dir+"/"+saved_model_name)
 
 
 """
@@ -109,24 +100,15 @@ args.saved_model = 'saved_model_prioritysort.pt'
 '''
 
 # Path for the model
-PATH = args.output_dir+"/priority_sort_{}_{}_{}_{}_{}_{}_{}_{}_{}/".format(
-    task_params['seq_width'] + 1,
-    task_params['seq_width'],
-    task_params['controller_size'],
-    task_params['memory_units'],
-    task_params['memory_unit_size'],
-    task_params['num_heads'],
-    task_params['uniform'],
-    task_params['random_distr'],
-    task_params['multi_layer_controller']
-)
+PATH = args.output_dir+"/"+saved_model_name
+
 # Check if the directory exists. Create it otherwise
 if not os.path.isdir(PATH):
     os.makedirs(PATH)
     os.makedirs(PATH+"/images")
 
 bare_path = PATH
-PATH = PATH+saved_model_name
+PATH = PATH+saved_model_name+".pt"
 
 # ----------------------------------------------------------------------------
 # -- basic training loop
@@ -197,6 +179,10 @@ for iter in tqdm(range(args.num_iters)):
 
         # Save an image with
         generate_target_original_plots(iter, task_params, PATH+".checkpoint_{}".format(iter), bare_path+"/images")
+
+        # Save all the configurations used
+        with f as open(PATH+".config_{}".format(iter), "w+"):
+            f.write(str(task_params)+"\n"+str(args))
 
 # ---saving the model---
 torch.save(ntm.state_dict(), PATH)
